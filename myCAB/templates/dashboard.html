@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Login System</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+</head>
+<body>
+  <div class="card-wrapper">
+
+    <div class="card">
+      <h1 class="center">Dashboard</h1>
+      <p class="center">You are currently logged in.</p>
+      <div class="center">
+        <a href="/user/signout" class="btn btn--secondary">Sign Out</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="center">Your Info</h2>
+      <p>
+        <strong>ID:</strong> {{ session['user']['_id'] }}<br>
+        <strong>Name:</strong> {{ session['user']['name'] }}<br>
+        <strong>Email:</strong> {{ session['user']['email'] }}
+      </p>
+    </div>
+
+    <div class="card">
+      <h2 class="center">Find a Ride</h2>
+      <form id="rideForm" method="POST" action="/find_ride">
+        <label for="pickup">Start Location:</label><br>
+        <input type="text" id="pickup" name="pickup" placeholder="Enter start location or use current location"><br>
+        <button type="button" id="currentLocationBtn" class="btn btn--secondary">Use Current Location</button><br><br>
+        <label for="drop">End Location:</label><br>
+        <input type="text" id="drop" name="drop" placeholder="Enter end location"><br><br>
+        <button type="submit" class="btn btn--primary">Find Ride</button>
+    </form>
+    
+      <div id="map" style="height: 400px; width: 100%;"></div> <!-- Google Maps container -->
+    </div>
+  
+  </div>
+  
+  <!-- Include Google Maps API and the custom JavaScript file -->
+  <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbZaD6zR22kD4op11bbdYx5Al_qX-e8RE&libraries=places"></script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+  
+</body>
+</html>
