@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cab Information</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script>
+        function bookRide() {
+            alert("Ride booked successfully!");
+        }
+    </script>
 </head>
 <body>
     <div class="card-wrapper">
@@ -12,10 +17,12 @@
             <h1 class="center">Cab Information</h1>
             <p>
                 <strong>Driver Name:</strong> {{ cab.DriverName }}<br>
-                <strong>Vehicle Details:</strong> {{ cab.VehicleDetails }}<br>
-                <strong>Current Location:</strong> {{ cab.CurrentLocation.lat }}, {{ cab.CurrentLocation.lng }}<br>
-                <strong>Distance from Pickup:</strong> {{ cab.distance }} miles
+                <strong>Vehicle Details:</strong> {{ cab.NumberPlate }}<br>
+                <strong>Current Location:</strong> {{ cab.CurrentLocation }}<br>
+                <strong>Cab Model:</strong> {{ cab.CabModel }} <br>
+                <strong>Cab Distance:</strong> {{ distance }} miles<br>
             </p>
+            <button onclick="bookRide()" class="btn btn--primary">Book Ride</button>
         </div>
         <div class="center">
             <a href="/dashboard" class="btn btn--secondary">Back to Dashboard</a>
