@@ -51,16 +51,22 @@ def find_ride():
     # Find the nearest available cab
     nearest_cab = None
     min_distance = float('inf')
-
-    for cab in db.cabs.find({"CurrentStatus": "available"}):
-        cab_location = (cab['CurrentLocation']['lat'], cab['CurrentLocation']['lng'])
-        distance = geodesic((pickup_lat, pickup_lng), cab_location).miles
-        if distance < min_distance:
-            nearest_cab = cab
-            min_distance = distance
-
+    
+    
+    for cab in db.cabs.find({"Status": "Available"}):
+            current_location = cab.get('CurrentLocation')
+            cab_location = (current_location[0], current_location[1])  # Note: (latitude, longitude)
+            print(cab_location)  # For debugging
+            distance = geodesic((pickup_lat, pickup_lng), cab_location).miles
+            if distance < min_distance:
+                nearest_cab = cab
+                min_distance = distance
+    
+    print(nearest_cab)
+    
     if nearest_cab:
-        return jsonify({'redirect_url': url_for('cab_info', cab_id=str(nearest_cab['_id']))})
+        obj = jsonify({'redirect_url': url_for('cab_info', cab_id=str(nearest_cab['_id'])),'distance': min_distance})
+        return obj
     else:
         return jsonify({'error': 'No available cabs found'}), 404
     
@@ -70,10 +76,17 @@ def find_ride():
 @app.route('/cab_info/<cab_id>')
 @login_required
 def cab_info(cab_id):
-    cab = db.cabs.find_one({"_id": ObjectId(cab_id)})
-    if not cab:
-        return "Cab not found", 404
-    return render_template('cab_info.html', cab=cab)
+    try:
+        # Fetch cab information from the database
+        cab = db.cabs.find_one({"_id": ObjectId(cab_id)})
+        distance = request.args.get('distance')
+        if cab:
+            return render_template('cab_info.html', cab=cab, distance=distance)
+        else:
+            return redirect(url_for('dashboard'))
+    except Exception as e:
+        print(f"Error: {e}")
+        return redirect(url_for('dashboard'))
 
 
 if __name__ == '__main__':
