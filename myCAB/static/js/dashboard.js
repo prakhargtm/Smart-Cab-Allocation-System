@@ -61,14 +61,10 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Error: Your browser doesn\'t support geolocation.');
         }
     });
-    document.getElementById('rideForm').addEventListener('submit', function(event) {
-        event.preventDefault();  // Prevent the default form submission
-        
-        const pickup = document.getElementById('pickup').value;
-        const drop = document.getElementById('drop').value;
-        
-        if (pickup && drop) {
-            fetch('/find_ride', {
+
+    async function findRide(pickup, drop) {
+        try {
+            const response = await fetch('/find_ride', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -77,15 +73,41 @@ document.addEventListener('DOMContentLoaded', function() {
                     'pickup': pickup,
                     'drop': drop
                 })
-            })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;  // Redirect to the returned URL
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
-            })
-            .catch(error => alert('Error: ' + error.message));
+            });
+
+            // Log the entire response object
+            console.log('Full Response:', response);
+
+            // Ensure the response is ok (status code 2xx)
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText);
+            }
+
+            const data = await response.json();
+            console.log('Response Data:', data);
+
+            if (data.redirect_url) {
+                const redirectUrl = new URL(data.redirect_url, window.location.origin);
+            redirectUrl.searchParams.append('distance', data.distance);
+            window.location.href = redirectUrl.toString();   // Redirect to the returned URL
+            } else {
+                throw new Error(data.error || 'Unknown error occurred');
+            }
+        } catch (error) {
+            alert('Error: ' + error.message);
+        }
+    }
+
+    document.getElementById('rideForm').addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent the default form submission
+        
+        const pickup = document.getElementById('pickup').value;
+        const drop = document.getElementById('drop').value;
+        
+        if (pickup && drop) {
+            console.log("HI");
+            findRide(pickup, drop)
         } else {
             alert('Please enter both pickup and drop locations.');
         }
